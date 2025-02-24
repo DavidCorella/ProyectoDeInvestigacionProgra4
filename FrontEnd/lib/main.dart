@@ -10,14 +10,33 @@ class AsignaturasApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(appBar: AppBar(title: const Text('Resumen', style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.center)), 
-      body: Column(
-        children: [
-          const Asignaturas(),
-          Text("Promedio Final: 70", style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 25),textAlign: TextAlign.right),
-          const CreateAsignatura(),
-        ],
-      )
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Resumen',
+            style: TextStyle(
+              color: Colors.purple,
+              fontWeight: FontWeight.bold,
+              fontSize: 25,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        body: Column(
+          children: [
+            const Asignaturas(),
+            Text(
+              "Promedio Final: 70",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 25,
+              ),
+              textAlign: TextAlign.right,
+            ),
+            const CreateAsignatura(),
+          ],
+        ),
       ),
     );
   }
@@ -33,13 +52,19 @@ class CreateAsignatura extends StatefulWidget {
 class _CreateAsignaturaState extends State<CreateAsignatura> {
   @override
   Widget build(BuildContext context) {
-    final ButtonStyle style = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20, color: Colors.purple));
+    final ButtonStyle style = ElevatedButton.styleFrom(
+      textStyle: const TextStyle(fontSize: 20, color: Colors.purple),
+    );
 
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElevatedButton(style: style, onPressed: (){}, child: const Text('Crear Asignatura')),
+          ElevatedButton(
+            style: style,
+            onPressed: () {},
+            child: const Text('Crear Asignatura'),
+          ),
           const SizedBox(height: 30),
         ],
       ),
@@ -53,7 +78,11 @@ class Asignaturas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Table(
-      border: TableBorder.all(width: 4, borderRadius: BorderRadius.all(Radius.circular(10)),color: Colors.grey),
+      border: TableBorder.all(
+        width: 4,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        color: Colors.grey,
+      ),
       columnWidths: const <int, TableColumnWidth>{
         0: IntrinsicColumnWidth(),
         1: FlexColumnWidth(),
@@ -64,31 +93,77 @@ class Asignaturas extends StatelessWidget {
         TableRow(
           children: <Widget>[
             TableCell(
-              verticalAlignment: TableCellVerticalAlignment.top,
-              child: Padding(padding: EdgeInsets.all(16.0),
-              child: Text("Asignatura",style: TextStyle(color: Colors.purple[600], fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.center,),)
-            ),
-            TableCell(
-              verticalAlignment: TableCellVerticalAlignment.top,
-              child:  Padding(padding: EdgeInsets.all(16.0),child: Text("Promedio", style: TextStyle(color: Colors.purple[600], fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.center,),)
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child:
+                    Text(
+                      "PrograIV",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    ),
+                    Expanded(
+                      child:
+                    Text(
+                      "90",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
+                      textAlign: TextAlign.center,
+                    ))
+                    ,Expanded(
+                      child: 
+                    const EditarNotas(),)
+                  ],
+                ),
+              ),
             ),
           ],
         ),
-        TableRow(
-          children: <Widget>[
-            TableCell(
-              verticalAlignment: TableCellVerticalAlignment.top,
-              child: Padding(padding: EdgeInsets.all(16.0),
-              child: Text("Progra4",style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 20),textAlign: TextAlign.center,),)
-            ),
-            TableCell(
-              verticalAlignment: TableCellVerticalAlignment.top,
-              child:  Padding(padding: EdgeInsets.all(16.0),child: Text("70", style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 20),textAlign: TextAlign.center,),)
-            ),
-          ],
-        ),
-        
       ],
+    );
+  }
+}
+
+
+class EditarNotas extends StatefulWidget {
+  const EditarNotas({super.key});
+
+  @override
+  State<EditarNotas> createState() => _EditarNotasState();
+}
+
+class _EditarNotasState extends State<EditarNotas> {
+  @override
+  Widget build(BuildContext context) {
+    final ButtonStyle style = ElevatedButton.styleFrom(
+      textStyle: const TextStyle(fontSize: 20, color: Colors.purple),
+    );
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ElevatedButton(
+            style: style,
+            onPressed: () {},
+            child: const Text('Detalle de Notas'),
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
     );
   }
 }
