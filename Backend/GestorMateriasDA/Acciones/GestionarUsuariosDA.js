@@ -1,11 +1,13 @@
 import { connect } from "../Config/db.js";
+import { ObjectId } from "mongodb";
+import { Error } from "mongoose";
 
 export default class UsersDA {
 
   async PostUser(Usuario) {
     try {
       const database = await connect();
-      const result = await database.collection("Materias").insertOne({ "ID": Usuario.GetID(), "User": Usuario.GetUser(), "Password": Usuario.GetContrasenna(), "Email": Usuario.GetEmail() })
+      await database.collection("Materias").insertOne({ "User": Usuario.GetUser(), "Password": Usuario.GetContrasenna(), "Email": Usuario.GetEmail() })
       return true;
     } catch (error) {
       new Error("Error al registrar  al usuario: " + error);
@@ -15,10 +17,15 @@ export default class UsersDA {
   async GetUser(id) {
     try {
       const database = await connect();
-      const result = await database.collection("Materias").findById(id);
+      const result = await database.collection("Materias").findOne({ _id: new ObjectId(id) });
+      
+      if (!result) {
+        throw new Error("Usuario no encontrado");
+      }
       return result;
     } catch (error) {
-      new Error("Error al obtener el usuario: " + error);
+      console.log(error);
+      throw error;
     }
   }
 }

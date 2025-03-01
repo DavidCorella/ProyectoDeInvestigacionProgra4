@@ -3,8 +3,7 @@ const Joi = require('joi');
 
     usuarioValido(Usuario){  
         
-        const schema = Joi.object({
-            id: Joi.string().max(3),
+        const schema = Joi.object({            
             user : Joi.string().alphanum().min(3).max(15).required(),
             contrasenna: Joi.string().min(8).required(),
             email : Joi.string().email().required()

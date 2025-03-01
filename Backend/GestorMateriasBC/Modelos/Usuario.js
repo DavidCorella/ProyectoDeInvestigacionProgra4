@@ -1,7 +1,6 @@
 
 export default class Usuario {
-    constructor(id, user, contrasenna, email) {
-        this.id = id;
+    constructor(user, contrasenna, email) {
         this.user = user;
         this.contrasenna = contrasenna;
         this.email = email;
@@ -29,13 +28,5 @@ export default class Usuario {
 
     SetEmail(email) {
         this.email = email;
-    }
-
-    GetID() {
-        return this.id;
-    }
-
-    SetID(id) {
-        this.id = id;
     }
 }

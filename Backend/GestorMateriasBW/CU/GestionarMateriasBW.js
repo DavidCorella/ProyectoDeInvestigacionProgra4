@@ -2,24 +2,23 @@ import ReglasRegistrarUser from "../../GestorMateriasBC/ReglasdeNegocio/ReglasRe
 import RegistrarUserDA from "../../GestorMateriasDA/Acciones/GestionarUsuariosDA.js"
 class GestionarMateriasBW {
     RegistrarUsuario(Usuario) {
-        return new Promise((resolve, reject) => {
+      
             const reglas = new ReglasRegistrarUser();
             const registrarUserDA = new RegistrarUserDA();
 
             if (reglas.usuarioValido(Usuario) == "exito") {
-                resolve(registrarUserDA.RegistarUser(Usuario));
+                return registrarUserDA.PostUser(Usuario);
             }
             else {
-                reject(new Error("Fallo al registrar el usuario: " + mensaje));
+           new Error("Fallo al registrar el usuario: " + mensaje);
             }
-        });
+        
     }
 
-    Obtenerusuario(id){
-        return new Promise((resolve, reject) => {
+    ObtenerUsuario(id) {
             const registrarUserDA = new RegistrarUserDA();
-            resolve(registrarUserDA.GetUser(id));
-        });
+            return registrarUserDA.GetUser(id);
+        
     }
 }
 
