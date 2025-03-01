@@ -1,56 +1,43 @@
-const express = require('express');
-const app = express();
-const port = 3000;
 
-app.get('/', (req, res) => {
-  res.send('Hello world!');
-});
+import { connect } from "../Config/db.js";
+import Usuario from "../../GestorMateriasBC/Modelos/Usuario.js";
+export default class RegistrarUserDA{
 
-app.listen(port, () => {
-  console.log(`Server listen on http://localhost:${port}`);
-});
-
-const mongoose = require('mongoose');
-
-const users = new mongoose.Schema({
-  user: {
-    type: String,
-    required: true
-  },
-  mail: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
+  async RegistarUser(Usuario){
+    try {
+      const database = await connect();
+      const result = await database.collection("Materias").insertOne({"User": Usuario.GetUser(), "Password" : Usuario.GetContrasenna(), "mail":Usuario.GetEmail()})
+      return true;
+    } catch (error) {
+        console.error(error)
+    }
   }
-});
-
-const tokens = new mongoose.Schema({
-  user: {
-    type: String,
-    required: true
-  },
-  token: {
-    type: String,
-    required: true
-  },
-  due: {
-    type: Date,
-    default: Date.now
-  },
-  id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'users'
-  }
-});
-const { users, tokens } = require('./schemas');
-
-const userModel = mongoose.model('User', authorSchema);
-const tokenModel = mongoose.model('token', bookSchema);
-
-module.exports = {
-  users,
-  tokens
 }
+
+/*
+ const DA = async ()=> {
+    try {
+      const database = await connect();
+      const result = await database.collection("Materias").find().toArray();
+      console.table(result)
+      console.log("Listo");
+    } catch (error) {
+        console.error(error);
+    }
+ }
+*/
+ /*
+const add = async () => {
+  try {
+    const database = await connect();
+    const result = await database.collection("Materias").insertOne({"user": "Josue", "password" : "456789", "mail":"dasasss"})
+    console.log(result)
+    console.log("Added")
+  } catch (error) {
+      console.error(error)
+  }
+}
+*/
+
+
+
