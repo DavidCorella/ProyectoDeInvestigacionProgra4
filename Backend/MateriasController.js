@@ -17,4 +17,15 @@ function setUser(user, password, email) {
 
 }
 
-export { getUser, setUser }
+function getUserBy(usuario){
+  let gestionarMaterias = new GestionarMateriasBW();  
+  return gestionarMaterias.ObtenerUsuarioBy(usuario);
+}
+
+function putUser(id, user, password, email){
+  let newUser = new Usuario(user, password, email);
+  let gestionarMaterias = new GestionarMateriasBW();  
+  return gestionarMaterias.ActualizarUsuario(id, newUser);
+}
+
+export { getUser, setUser, getUserBy, putUser}
