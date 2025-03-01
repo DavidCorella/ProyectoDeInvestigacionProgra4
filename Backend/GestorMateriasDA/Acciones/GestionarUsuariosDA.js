@@ -1,43 +1,25 @@
-
 import { connect } from "../Config/db.js";
-import Usuario from "../../GestorMateriasBC/Modelos/Usuario.js";
-export default class RegistrarUserDA{
 
-  async RegistarUser(Usuario){
+export default class UsersDA {
+
+  async PostUser(Usuario) {
     try {
       const database = await connect();
-      const result = await database.collection("Materias").insertOne({"User": Usuario.GetUser(), "Password" : Usuario.GetContrasenna(), "mail":Usuario.GetEmail()})
+      const result = await database.collection("Materias").insertOne({ "ID": Usuario.GetID(), "User": Usuario.GetUser(), "Password": Usuario.GetContrasenna(), "Email": Usuario.GetEmail() })
       return true;
     } catch (error) {
-        console.error(error)
+      new Error("Error al registrar  al usuario: " + error);
     }
   }
-}
 
-/*
- const DA = async ()=> {
+  async GetUser(id) {
     try {
       const database = await connect();
-      const result = await database.collection("Materias").find().toArray();
-      console.table(result)
-      console.log("Listo");
+      const result = await database.collection("Materias").findById(id);
+      return result;
     } catch (error) {
-        console.error(error);
+      new Error("Error al obtener el usuario: " + error);
     }
- }
-*/
- /*
-const add = async () => {
-  try {
-    const database = await connect();
-    const result = await database.collection("Materias").insertOne({"user": "Josue", "password" : "456789", "mail":"dasasss"})
-    console.log(result)
-    console.log("Added")
-  } catch (error) {
-      console.error(error)
   }
 }
-*/
-
-
 

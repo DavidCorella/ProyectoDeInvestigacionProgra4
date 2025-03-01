@@ -1,11 +1,22 @@
-import Usuario from "../Modelos/Usuario.js";
-export default class ReglasRegistrarUser{
+const Joi = require('joi');
+ class ReglasRegistrarUser{
 
-    usuarioValido(Usuario){
+    usuarioValido(Usuario){  
+        
+        const schema = Joi.object({
+            id: Joi.string().max(3),
+            user : Joi.string().alphanum().min(3).max(15).required(),
+            contrasenna: Joi.string().min(8).required(),
+            email : Joi.string().email().required()
+        });
 
-        console.log(Usuario.GetUser());
-        let validEmail =  /^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i;
-        return  (Usuario.GetUser()).length > 1 && (Usuario.GetContrasenna()).length >= 8 && validEmail.test(Usuario.GetEmail())?
-            true : false;
+        const {error, value} = schema.validate(Usuario);
+
+        if (error){
+          return error;
+        }
+        return "exito"; 
     }
 }
+
+module.exports = ReglasRegistrarUser;
