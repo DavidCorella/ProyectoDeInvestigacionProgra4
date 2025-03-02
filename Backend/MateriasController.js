@@ -28,4 +28,32 @@ function putUser(id, user, password, email){
   return gestionarMaterias.ActualizarUsuario(id, newUser);
 }
 
-export { getUser, setUser, getUserBy, putUser}
+function getAsignatureByUser(id){
+  let gestionarMaterias = new GestionarMateriasBW();
+  return gestionarMaterias.ObtenerAsignaturas(id);
+}
+
+function setAsignature(userId, name, description, createdAt) {
+
+  let newAsignature = new Asignatura(userId, name, description, createdAt);
+
+  const gestionarMaterias = new GestionarMateriasBW();
+
+ return gestionarMaterias.RegistrarAsignatura(newAsignature)
+}
+
+function putAsignature(id, userId, name, description) {
+
+  let newAsignature = new Asignatura(userId, name, description, null);
+
+  const gestionarMaterias = new GestionarMateriasBW();
+
+ return gestionarMaterias.ActualizarAsignatura(id, newAsignature)
+}
+
+function deleteAsignature(id) {
+  const gestionarMaterias = new GestionarMateriasBW();
+ return gestionarMaterias.EliminarAsignatura(id)
+}
+
+export { getUser, setUser, getUserBy, putUser, getAsignatureByUser, setAsignature, putAsignature, deleteAsignature}

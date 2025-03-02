@@ -1,10 +1,9 @@
-
+const config = require("../../../config.js"); 
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { getUser, setUser, getUserBy, putUser } = require('../../../MateriasController');
-require('dotenv').config();
+const { getUser, setUser, getUserBy, putUser, getAsignatureByUser, setAsignature, putAsignature, deleteAsignature } = require('../../../MateriasController');
 const { default: Usuario } = require('../../../GestorMateriasBC/Modelos/Usuario');
 
 router.route('/auth/register').post((req, res) => {
@@ -71,10 +70,10 @@ router.route('/auth/login').post((req, res) => {
             if (!isMatch) {
                 return res.status(400).json({ message: "Contraseña incorrecta" });
             }
-
-            const payload = { userId: param._id };
-            const secretKey = process.env.JWT_SECRET;
-            jwt.sign(payload, secretKey, { expiresIn: "12h" }, (err, token) => {
+            const secret = config.JWT_SECRET;
+            const payload = { userId: param._id};
+            //const secretKey = process.env.JWT_SECRET;
+            jwt.sign(payload, secret, {expiresIn: "12h"}, (err, token) => {
                 if (err) {
                     return res.status(500).json({
                         message: 'Error al generar el token',
@@ -135,6 +134,65 @@ router.route("/users/:id").put((req, res) => {
         }
     });
 
+});
+
+router.route("/subjects/:id").get((req, res) => {
+
+    getAsignatureByUser(req.params.id).then((param) => {
+        console.log(param);
+        res.status(200).json(param);
+    }).catch((error) => {
+        res.status(500).json({ message: error.message });
+    });
+});
+
+router.route("/subjects").post((req, res) => {
+
+    const {userId, name, description, createdAt} = req.body;
+
+    setAsignature(userId, name, description, createdAt).then(() => {
+        res.status(200).json({
+            message: 'Asignatura creada correctamente'
+        });
+    }).catch((error) => {
+        res.status(500).json({
+            message: 'Error creando la asignatura',
+            error: error.message
+        });
+    });
+});
+
+router.route("/subjects/:id").put((req, res) => {
+
+    const {userId, name, description} = req.body;
+    const {id} = req.params;
+
+    putAsignature(id, userId, name, description).then(() => {
+        res.status(200).json({
+            message: 'Asignatura actualizada correctamente'
+        });
+    }).catch((error) => {
+        res.status(500).json({
+            message: 'Error actualizando asignatura',
+            error: error.message
+        });
+    });
+});
+
+router.route("/subjects/:id").delete((req, res) => {
+
+    const {id} = req.params;
+
+    deleteAsignature(id).then(() => {
+        res.status(200).json({
+            message: 'Asignatura eliminada correctamente'
+        });
+    }).catch((error) => {
+        res.status(500).json({
+            message: 'Error eliminando asignatura',
+            error: error.message
+        });
+    });
 });
 
 module.exports = router;

@@ -37,6 +37,26 @@ class GestionarMateriasBW {
             new Error("Fallo en las reglas de usuario: " + mensaje);
         }
     }
+
+    ObtenerAsignaturas(id){
+        const registrarUserDA = new RegistrarUserDA();
+        return registrarUserDA.GetAsignatureByUser(id);
+    }
+
+    RegistrarAsignatura(Asignatura) {
+        const registrarUserDA = new RegistrarUserDA();
+        return registrarUserDA.PostAsignature(Asignatura);
+    }
+
+    ActualizarAsignatura(id, Asignatura){
+        const registrarUserDA = new RegistrarUserDA();
+        return registrarUserDA.PutAsignature(id, Asignatura);
+    }
+
+    EliminarAsignatura(id){
+        const registrarUserDA = new RegistrarUserDA();
+        return registrarUserDA.DeleteAsignature(id);
+    }
 }
 
 export default GestionarMateriasBW;
