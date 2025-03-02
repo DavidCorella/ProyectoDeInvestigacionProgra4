@@ -7,7 +7,9 @@ const app = express();
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-app.use('/api/Materias', require('./routes/routes'))
+app.use('/api/Asignaturas', require('./routes/routes'))
+app.use('/api/Usuarios', require('./routes/routes'))
+app.use('/api/Calificaciones', require('./routes/routes'))
 
 app.use(errorHandler);
 

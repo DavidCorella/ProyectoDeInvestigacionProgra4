@@ -3,8 +3,10 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { getUser, setUser, getUserBy, putUser, getAsignatureByUser, setAsignature, putAsignature, deleteAsignature } = require('../../../MateriasController');
-const { default: Usuario } = require('../../../GestorMateriasBC/Modelos/Usuario');
+const {getAsignatureByUser, setAsignature, putAsignature, deleteAsignature } = require('../../../Controllers/AsignaturasController.js');
+const { getUser, setUser, getUserBy, putUser} = require('../../../Controllers/UsuariosController.js');
+const{getCalificacionBySubject, setCalificacion, putCalificacion ,deleteCalificacion}=require("../../../Controllers/CalificacionesController")
+
 
 router.route('/auth/register').post((req, res) => {
 
@@ -72,7 +74,6 @@ router.route('/auth/login').post((req, res) => {
             }
             const secret = config.JWT_SECRET;
             const payload = { userId: param._id};
-            //const secretKey = process.env.JWT_SECRET;
             jwt.sign(payload, secret, {expiresIn: "12h"}, (err, token) => {
                 if (err) {
                     return res.status(500).json({
@@ -137,9 +138,8 @@ router.route("/users/:id").put((req, res) => {
 });
 
 router.route("/subjects/:id").get((req, res) => {
-
     getAsignatureByUser(req.params.id).then((param) => {
-        console.log(param);
+        console.log(param)
         res.status(200).json(param);
     }).catch((error) => {
         res.status(500).json({ message: error.message });
@@ -164,10 +164,10 @@ router.route("/subjects").post((req, res) => {
 
 router.route("/subjects/:id").put((req, res) => {
 
-    const {userId, name, description} = req.body;
+    const { name, description} = req.body;
     const {id} = req.params;
 
-    putAsignature(id, userId, name, description).then(() => {
+    putAsignature(id, name, description).then(() => {
         res.status(200).json({
             message: 'Asignatura actualizada correctamente'
         });
@@ -195,4 +195,62 @@ router.route("/subjects/:id").delete((req, res) => {
     });
 });
 
+router.route("/grades/:id").get((req, res) => {
+
+    getCalificacionBySubject(req.params.id).then((param) => {
+        console.log(param);
+        res.status(200).json(param);
+    }).catch((error) => {
+        res.status(500).json({ message: error.message });
+    });
+});
+
+router.route("/grades").post((req, res) => {
+
+    const {subjectId, grade, createdAt} = req.body;
+
+    setCalificacion(subjectId, grade, createdAt).then(() => {
+        res.status(200).json({
+            message: 'Calificacion creada correctamente'
+        });
+    }).catch((error) => {
+        res.status(500).json({
+            message: 'Error creando la Calificacion',
+            error: error.message
+        });
+    });
+});
+
+router.route("/grades/:id").put((req, res) => {
+
+    const { grade} = req.body;
+    const {id} = req.params;
+
+    putCalificacion(id, grade).then(() => {
+        res.status(200).json({
+            message: 'Calificacion actualizada correctamente'
+        });
+    }).catch((error) => {
+        res.status(500).json({
+            message: 'Error actualizando calificacion',
+            error: error.message
+        });
+    });
+});
+
+router.route("/grades/:id").delete((req, res) => {
+
+    const {id} = req.params;
+
+    deleteCalificacion(id).then(() => {
+        res.status(200).json({
+            message: 'Calificacion eliminada correctamente'
+        });
+    }).catch((error) => {
+        res.status(500).json({
+            message: 'Error eliminando Calificacion',
+            error: error.message
+        });
+    });
+});
 module.exports = router;
