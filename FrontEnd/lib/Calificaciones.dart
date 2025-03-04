@@ -3,15 +3,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'TokenStorage.dart';
 
 class DetalleAsignaturaPantalla extends StatefulWidget {
   final String subjectId;
-  final String token;
-  const DetalleAsignaturaPantalla({
-    super.key,
-    required this.subjectId,
-    required this.token,
-  });
+  const DetalleAsignaturaPantalla({super.key, required this.subjectId});
   @override
   DetalleAsignaturaPantallaState createState() =>
       DetalleAsignaturaPantallaState();
@@ -20,7 +16,8 @@ class DetalleAsignaturaPantalla extends StatefulWidget {
 class DetalleAsignaturaPantallaState extends State<DetalleAsignaturaPantalla> {
   List<Map<String, dynamic>> calificaciones = [];
   final String apiUrl = 'http://10.0.2.2:3000/api/Calificaciones/grades';
-
+  final TokenStorage tokenStorage = TokenStorage();
+  String? token = "";
   List<BarChartGroupData> _crearDatosGrafico() {
     return calificaciones.map((calificacion) {
       return BarChartGroupData(
@@ -39,6 +36,12 @@ class DetalleAsignaturaPantallaState extends State<DetalleAsignaturaPantalla> {
   @override
   void initState() {
     super.initState();
+    _cargarToken();
+  }
+
+  Future<void> _cargarToken() async {
+    token = await tokenStorage.getToken();
+
     _rellenarLista();
   }
 
@@ -168,7 +171,7 @@ class DetalleAsignaturaPantallaState extends State<DetalleAsignaturaPantalla> {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ${widget.token}',
+        'Authorization': 'Bearer ${token}',
       },
       body: json.encode({
         'subjectId': subjectId,
@@ -191,7 +194,7 @@ class DetalleAsignaturaPantallaState extends State<DetalleAsignaturaPantalla> {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ${widget.token}',
+        'Authorization': 'Bearer ${token}',
       },
     );
 
@@ -260,7 +263,7 @@ class DetalleAsignaturaPantallaState extends State<DetalleAsignaturaPantalla> {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ${widget.token}',
+        'Authorization': 'Bearer ${token}',
       },
       body: json.encode({'grade': calificacion}),
     );
@@ -271,15 +274,15 @@ class DetalleAsignaturaPantallaState extends State<DetalleAsignaturaPantalla> {
       print('Error al actualizar la calificación');
     }
   }
-  
+
   Future<void> _eliminarCalificacion(String id) async {
     final response = await http.delete(
       Uri.parse('$apiUrl/$id'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ${widget.token}',
-      }      
+        'Authorization': 'Bearer ${token}',
+      },
     );
 
     if (response.statusCode == 200) {

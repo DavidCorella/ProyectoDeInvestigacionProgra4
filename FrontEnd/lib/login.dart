@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'Asignaturas.dart';
 import 'package:email_validator/email_validator.dart';
-
+import 'TokenStorage.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -16,7 +16,8 @@ class _LoginPantallaState extends State<Login> {
   final String apiUrl = 'http://10.0.2.2:3000/api/Usuarios/auth';
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TokenStorage tokenStorage = TokenStorage();
   void _auth() async {
     final username = _usernameController.text;
     final password = _passwordController.text;
@@ -38,9 +39,14 @@ final TextEditingController _emailController = TextEditingController();
         final String token = databody['token'];
         final String userId = databody['userId'];
 
+        await tokenStorage.storeToken(token);
+
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DetalleAsignatura(userId: userId,token: token,)),
+          MaterialPageRoute(
+            builder:
+                (context) => DetalleAsignatura(userId: userId),
+          ),
         );
       } else {
         Fluttertoast.showToast(
@@ -138,22 +144,16 @@ final TextEditingController _emailController = TextEditingController();
             children: [
               TextField(
                 controller: controllerTextuser,
-                decoration: InputDecoration(
-                  labelText: 'Digite el usuario',
-                ),
+                decoration: InputDecoration(labelText: 'Digite el usuario'),
               ),
               TextField(
                 controller: controllerTextPass,
-                decoration: InputDecoration(
-                  labelText: 'Digite la contraseña',
-                ),
+                decoration: InputDecoration(labelText: 'Digite la contraseña'),
                 obscureText: true,
               ),
               TextField(
                 controller: controllerTextDescEmail,
-                decoration: InputDecoration(
-                  labelText: 'Digite el correo',
-                ),
+                decoration: InputDecoration(labelText: 'Digite el correo'),
               ),
             ],
           ),
@@ -181,35 +181,38 @@ final TextEditingController _emailController = TextEditingController();
     );
   }
 
-  Future<void> _CrearUsuario(
-  String user,
-  String password,
-  String email,
-) async {
-  if (_esEmailValido(email) && password.length >= 8 ) {
-    final response = await http.post(
-      Uri.parse('$apiUrl/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'user': user,
-        'password': password,
-        'email': email,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      Fluttertoast.showToast(
-        msg: 'Usuario Creado',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: const Color.fromARGB(255, 225, 244, 54),
-        textColor: Colors.white,
-        fontSize: 16.0,
+  Future<void> _CrearUsuario(String user, String password, String email) async {
+    if (_esEmailValido(email) && password.length >= 8) {
+      final response = await http.post(
+        Uri.parse('$apiUrl/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'user': user, 'password': password, 'email': email}),
       );
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: 'Usuario Creado',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: const Color.fromARGB(255, 225, 244, 54),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Error al crear usario',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: const Color.fromARGB(255, 225, 244, 54),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
     } else {
       Fluttertoast.showToast(
-        msg: 'Error al crear usario',
+        msg: 'Email o contraseña no válido',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1,
@@ -218,20 +221,9 @@ final TextEditingController _emailController = TextEditingController();
         fontSize: 16.0,
       );
     }
-  } else {
-    Fluttertoast.showToast(
-      msg: 'Email o contraseña no válido',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: const Color.fromARGB(255, 225, 244, 54),
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
   }
-}
-  bool _esEmailValido(String email) {
-  return EmailValidator.validate(email);
-}
 
+  bool _esEmailValido(String email) {
+    return EmailValidator.validate(email);
+  }
 }

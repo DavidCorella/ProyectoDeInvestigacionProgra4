@@ -4,17 +4,13 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'Usuario.dart';
 import 'UsuarioV2.dart';
+import 'TokenStorage.dart';
 
 import 'package:investigacion/Calificaciones.dart';
 
 class DetalleAsignatura extends StatefulWidget {
   final String userId;
-  final String token;
-  const DetalleAsignatura({
-    super.key,
-    required this.userId,
-    required this.token,
-  });
+  const DetalleAsignatura({super.key, required this.userId});
   @override
   DetalleAsignaturaState createState() => DetalleAsignaturaState();
 }
@@ -22,11 +18,19 @@ class DetalleAsignatura extends StatefulWidget {
 class DetalleAsignaturaState extends State<DetalleAsignatura> {
   List<dynamic> asignaturas = [];
   String users = "";
+  String? token = "";
   final String apiUrl = 'http://10.0.2.2:3000/api/Asignaturas/subjects';
+  final TokenStorage tokenStorage = TokenStorage();
 
   @override
   void initState() {
     super.initState();
+    _cargarToken();
+  }
+
+  Future<void> _cargarToken() async {
+    token = await tokenStorage.getToken();
+
     _rellenarLista();
     userdata();
   }
@@ -43,10 +47,7 @@ class DetalleAsignaturaState extends State<DetalleAsignatura> {
                 context,
                 MaterialPageRoute(
                   builder:
-                      (context) => UsuarioInformacion(
-                        userId: widget.userId,
-                        token: widget.token,
-                      ),
+                      (context) => UsuarioInformacion(userId: widget.userId),
                 ),
               );
             },
@@ -58,7 +59,7 @@ class DetalleAsignaturaState extends State<DetalleAsignatura> {
           !asignaturas.isNotEmpty
               ? Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Center(child: Text('No hay calificaciones disponibles')),
+                child: Center(child: Text('No hay asignaturas disponibles')),
               )
               : Expanded(
                 child: ListView.builder(
@@ -71,6 +72,14 @@ class DetalleAsignaturaState extends State<DetalleAsignatura> {
                       ),
                       onTap: () => cambiarPantalla(asignaturas[index]['_id']),
                       onLongPress: () => _editarAsignatura(context, index),
+                       trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      setState(() {
+                        _eliminarAsignatura(asignaturas[index]['_id']);
+                      });
+                    },
+                  ),
                     );
                   },
                 ),
@@ -90,9 +99,25 @@ class DetalleAsignaturaState extends State<DetalleAsignatura> {
     );
   }
 
+Future<void> _eliminarAsignatura(String id) async {
+    final response = await http.delete(
+      Uri.parse('$apiUrl/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${token}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      _rellenarLista();
+    } else {
+      print('Error al actualizar la calificación');
+    }
+  }
+
   Future<void> _rellenarLista() async {
     String user = widget.userId;
-    String token = widget.token;
     final response = await http.get(
       Uri.parse('$apiUrl/$user'),
       headers: {
@@ -179,7 +204,11 @@ class DetalleAsignaturaState extends State<DetalleAsignatura> {
 
     final response = await http.post(
       Uri.parse('$apiUrl'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${token}',
+      },
       body: json.encode({
         'userId': user,
         'name': name,
@@ -199,9 +228,7 @@ class DetalleAsignaturaState extends State<DetalleAsignatura> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) =>
-                DetalleAsignaturaPantalla(subjectId: id, token: widget.token),
+        builder: (context) => DetalleAsignaturaPantalla(subjectId: id),
       ),
     );
   }
@@ -266,7 +293,11 @@ class DetalleAsignaturaState extends State<DetalleAsignatura> {
   ) async {
     final response = await http.put(
       Uri.parse('$apiUrl/$id'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${token}',
+      },
       body: json.encode({'name': name, 'description': description}),
     );
 
@@ -279,7 +310,6 @@ class DetalleAsignaturaState extends State<DetalleAsignatura> {
 
   Future<void> userdata() async {
     String user = widget.userId;
-    String token = widget.token;
     final response = await http.get(
       Uri.parse('http://10.0.2.2:3000/api/Usuarios/users/$user'),
       headers: {

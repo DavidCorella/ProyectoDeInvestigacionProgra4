@@ -1,4 +1,4 @@
-
+import ReglasCalificaciones from "../../GestorBC/ReglasdeNegocio/ReglaNegocioCalificaciones.js"
 import RegistrarCalificacionDA from "../../GestorDA/Acciones/GestionarCalificacionesDA.js"
 class GestionarCalificacionesBW {
 
@@ -9,12 +9,27 @@ class GestionarCalificacionesBW {
 
     RegistrarCalificacion(Calificacion) {
         const registrarCalificacionDA = new RegistrarCalificacionDA();
-        return registrarCalificacionDA.PostCalificacion(Calificacion);
+        const reglas = new ReglasCalificaciones();        
+        const mensaje = reglas.calificacionValida(Calificacion);
+        if (mensaje == "exito") {
+            return registrarCalificacionDA.PostCalificacion(Calificacion);
+        }
+        else {
+            new Error("Fallo en las reglas de califacion: " + mensaje);
+        }     
     }
 
     ActualizarCalificacion(id, Calificacion){
         const registrarCalificacionDA = new RegistrarCalificacionDA();
-        return registrarCalificacionDA.PutCalificaicon(id, Calificacion);
+        const reglas = new ReglasCalificaciones();        
+        const mensaje = reglas.calificacionValida(Calificacion);
+
+        if (mensaje == "exito") {
+            return registrarCalificacionDA.PutCalificaicon(id, Calificacion);
+        }
+        else {
+            new Error("Fallo en las reglas de califacion: " + mensaje);
+        }       
     }
 
     EliminarCalificacion(id){

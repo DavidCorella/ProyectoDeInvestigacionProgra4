@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'TokenStorage.dart';
 
 class UsuarioInformacion extends StatefulWidget {
   final String userId;
-  final String token;
-  const UsuarioInformacion({
-    super.key,
-    required this.userId,
-    required this.token,
-  });
+  const UsuarioInformacion({super.key, required this.userId});
   @override
   _UsuarioInformacionState createState() => _UsuarioInformacionState();
 }
@@ -20,10 +16,16 @@ class _UsuarioInformacionState extends State<UsuarioInformacion> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final String apiUrl = 'http://10.0.2.2:3000/api/Usuarios/users';
-
+  final TokenStorage tokenStorage = TokenStorage();
+  String? token = "";
   @override
   void initState() {
     super.initState();
+    _cargarToken();
+  }
+
+  Future<void> _cargarToken() async {
+    token = await tokenStorage.getToken();
     _rellaInfoUsuario();
   }
 
@@ -93,7 +95,6 @@ class _UsuarioInformacionState extends State<UsuarioInformacion> {
 
   Future<void> _rellaInfoUsuario() async {
     String user = widget.userId;
-    String token = widget.token;
     String url = '$apiUrl/$user';
     final response = await http.get(
       Uri.parse(url),
@@ -123,7 +124,6 @@ class _UsuarioInformacionState extends State<UsuarioInformacion> {
     String password,
     BuildContext context,
   ) async {
-    String token = widget.token;
     final response = await http.put(
       Uri.parse('$apiUrl/$id'),
       headers: {

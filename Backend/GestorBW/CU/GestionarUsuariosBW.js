@@ -28,7 +28,9 @@ class GestionarUsuariosBW {
     ActualizarUsuario(id, usuario) {
         const registrarUserDA = new RegistrarUserDA();
         const reglas = new ReglasRegistrarUser();
+        console.log(usuario)
         const mensaje = reglas.usuarioValido(usuario);
+        console.log(mensaje)
         if (mensaje == "exito") {
             return registrarUserDA.PutUser(id, usuario);
         }
