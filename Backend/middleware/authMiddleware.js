@@ -1,20 +1,18 @@
-
 const jwt = require('jsonwebtoken');
+const config = require("../config.js");
 
-function verificarToken(req, res, next) {
-    const token = req.headers['authorization'];
 
-    if (!token) {
-        return res.status(403).json({ message: 'Acceso denegado, token no proporcionado' });
-    }
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-    try {
-        const descodificado = jwt.verify(token, process.env.JWT_SECRET);
-        req.userID = descodificado.id;
+    if (token == null) return res.sendStatus(401); // No hay token
+
+    jwt.verify(token, config.JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403); // Token no válido
+        req.user = user; // Token válido
         next();
-    } catch (error) {
-        return res.status(401).json({ message: 'Token no válido o expirado' });
-    }
-}
+    });
+};
 
-module.exports = { verificarToken };
+module.exports = authenticateToken;

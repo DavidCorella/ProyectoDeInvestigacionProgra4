@@ -1,11 +1,12 @@
-const config = require("../../../config.js"); 
+const config = require("../../../config.js");
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const {getAsignatureByUser, setAsignature, putAsignature, deleteAsignature } = require('../../../Controllers/AsignaturasController.js');
-const { getUser, setUser, getUserBy, putUser} = require('../../../Controllers/UsuariosController.js');
-const{getCalificacionBySubject, setCalificacion, putCalificacion ,deleteCalificacion}=require("../../../Controllers/CalificacionesController")
+const { getAsignatureByUser, setAsignature, putAsignature, deleteAsignature } = require('../../../Controllers/AsignaturasController.js');
+const { getUser, setUser, getUserBy, putUser } = require('../../../Controllers/UsuariosController.js');
+const { getCalificacionBySubject, setCalificacion, putCalificacion, deleteCalificacion } = require("../../../Controllers/CalificacionesController")
+const authenticateToken = require('../../../middleware/authMiddleware.js')
 
 
 router.route('/auth/register').post((req, res) => {
@@ -42,7 +43,7 @@ router.route('/auth/register').post((req, res) => {
     });
 });
 
-router.route("/users/:id").get((req, res) => {
+router.route("/users/:id").get(authenticateToken, (req, res) => {
 
     getUser(req.params.id).then((param) => {
         res.status(200).json(param);
@@ -73,8 +74,8 @@ router.route('/auth/login').post((req, res) => {
                 return res.status(400).json({ message: "Contraseña incorrecta" });
             }
             const secret = config.JWT_SECRET;
-            const payload = { userId: param._id};
-            jwt.sign(payload, secret, {expiresIn: "12h"}, (err, token) => {
+            const payload = { userId: param._id };
+            jwt.sign(payload, secret, { expiresIn: "12h" }, (err, token) => {
                 if (err) {
                     return res.status(500).json({
                         message: 'Error al generar el token',
@@ -84,7 +85,8 @@ router.route('/auth/login').post((req, res) => {
 
                 res.status(200).json({
                     message: 'Inicio de sesión exitoso',
-                    token: token
+                    token: token,
+                    userId: param._id
                 });
             });
 
@@ -96,7 +98,7 @@ router.route('/auth/login').post((req, res) => {
     });
 });
 
-router.route("/users/:id").put((req, res) => {
+router.route("/users/:id").put(authenticateToken, (req, res) => {
 
     const { user, password, email } = req.body;
     const { id } = req.params;
@@ -137,18 +139,17 @@ router.route("/users/:id").put((req, res) => {
 
 });
 
-router.route("/subjects/:id").get((req, res) => {
+router.route("/subjects/:id").get(authenticateToken, (req, res) => {
     getAsignatureByUser(req.params.id).then((param) => {
-        console.log(param)
         res.status(200).json(param);
     }).catch((error) => {
         res.status(500).json({ message: error.message });
     });
 });
 
-router.route("/subjects").post((req, res) => {
+router.route("/subjects").post(authenticateToken, (req, res) => {
 
-    const {userId, name, description, createdAt} = req.body;
+    const { userId, name, description, createdAt } = req.body;
 
     setAsignature(userId, name, description, createdAt).then(() => {
         res.status(200).json({
@@ -162,10 +163,10 @@ router.route("/subjects").post((req, res) => {
     });
 });
 
-router.route("/subjects/:id").put((req, res) => {
+router.route("/subjects/:id").put(authenticateToken, (req, res) => {
 
-    const { name, description} = req.body;
-    const {id} = req.params;
+    const { name, description } = req.body;
+    const { id } = req.params;
 
     putAsignature(id, name, description).then(() => {
         res.status(200).json({
@@ -179,9 +180,9 @@ router.route("/subjects/:id").put((req, res) => {
     });
 });
 
-router.route("/subjects/:id").delete((req, res) => {
+router.route("/subjects/:id").delete(authenticateToken, (req, res) => {
 
-    const {id} = req.params;
+    const { id } = req.params;
 
     deleteAsignature(id).then(() => {
         res.status(200).json({
@@ -195,19 +196,18 @@ router.route("/subjects/:id").delete((req, res) => {
     });
 });
 
-router.route("/grades/:id").get((req, res) => {
+router.route("/grades/:subjectId").get(authenticateToken, (req, res) => {
 
-    getCalificacionBySubject(req.params.id).then((param) => {
-        console.log(param);
+    getCalificacionBySubject(req.params.subjectId).then((param) => {
         res.status(200).json(param);
     }).catch((error) => {
         res.status(500).json({ message: error.message });
     });
 });
 
-router.route("/grades").post((req, res) => {
+router.route("/grades").post(authenticateToken, (req, res) => {
 
-    const {subjectId, grade, createdAt} = req.body;
+    const { subjectId, grade, createdAt } = req.body;
 
     setCalificacion(subjectId, grade, createdAt).then(() => {
         res.status(200).json({
@@ -221,10 +221,10 @@ router.route("/grades").post((req, res) => {
     });
 });
 
-router.route("/grades/:id").put((req, res) => {
+router.route("/grades/:id").put(authenticateToken, (req, res) => {
 
-    const { grade} = req.body;
-    const {id} = req.params;
+    const { grade } = req.body;
+    const { id } = req.params;
 
     putCalificacion(id, grade).then(() => {
         res.status(200).json({
@@ -238,9 +238,9 @@ router.route("/grades/:id").put((req, res) => {
     });
 });
 
-router.route("/grades/:id").delete((req, res) => {
+router.route("/grades/:id").delete(authenticateToken, (req, res) => {
 
-    const {id} = req.params;
+    const { id } = req.params;
 
     deleteCalificacion(id).then(() => {
         res.status(200).json({
@@ -253,4 +253,7 @@ router.route("/grades/:id").delete((req, res) => {
         });
     });
 });
+
+
+
 module.exports = router;

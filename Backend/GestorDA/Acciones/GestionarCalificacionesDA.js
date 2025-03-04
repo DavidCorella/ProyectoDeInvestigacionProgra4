@@ -7,7 +7,7 @@ export default class GestionarCalificacionesDA {
   async GetCalificacionBySubject(id) {
     try {
       const database = await connect();
-      const result = await database.collection("Calificaciones").findOne({ subjectId: id });
+      const result = await database.collection("Calificaciones").find({ subjectId: id }).toArray();
 
       if (!result) {
         throw new Error("Calificaciones no encontradas para la asignatura indicada");

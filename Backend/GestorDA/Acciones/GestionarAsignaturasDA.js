@@ -7,7 +7,7 @@ export default class GestionarAsignaturasDA {
   async GetAsignatureByUser(id) {
     try {
       const database = await connect();
-      const result = await database.collection("Asignaturas").findOne({ userId: id });
+      const result = await database.collection("Asignaturas").find({ userId: id }).toArray();
       if (!result) {
         throw new Error("Asignaturas no encontradas para el usuario indicado");
       }
